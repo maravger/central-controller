@@ -1,0 +1,4 @@
+def permutator():
+
+
+def optimizer():
