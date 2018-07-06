@@ -1,4 +1,5 @@
-def permutator():
+def permutate():
+    return [[1, 2], [2, 3], [3, 4]]
 
-
-def optimizer():
+def optimize(combinations, predicted_workload):
+    return [[1, 2]]
