@@ -25,6 +25,7 @@ def permutator():
                 combination = [i, j]
                 combinations.append(combination)
 
+    return combinations
 #    print combinations
 
 
@@ -126,7 +127,6 @@ def optimizer(combinations, predictedWorkload):
 
     #print final
     return final
-
 
 
 
