@@ -29,7 +29,7 @@ def permutator():
 #    print combinations
 
 
-def optimizer(combinations, predictedWorkload):
+def optimizer(combinations, predictedWorkload, HOSTS):
     n = len(combinations)
     print n
     ncol = n
@@ -124,7 +124,10 @@ def optimizer(combinations, predictedWorkload):
         while (temp[0][i] > 0):
             temp[0][i] -= 1
             final.append(combinations[i])
-
+    
+    for i in range(len(final), HOSTS):
+                final.append([0,0])
+    #
     #print final
     return final
 
