@@ -1,27 +1,20 @@
 from __future__ import absolute_import, unicode_literals
 from logging import Logger
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import transaction
-from celery import task
-from django.db import OperationalError
-from django.conf import settings
-import logging
-import subprocess
-import requests
-import os
 from api.views import optimizer
 from api.views import workload_predictor
 from django.conf import settings
 from api.models import App
 from django.core.exceptions import ObjectDoesNotExist
-
+import requests
+import logging
+from celery import task
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)  # type: Logger
 
 @task()
 def scale_horizontally():
-    #TODO find a better way to initiate app creation
+    # TODO find a better way to initiate app creation
     for app_id in settings.GLOBAL_SETTINGS['APPS']:
         try:
             App.objects.get(app_id=app_id)
@@ -29,8 +22,47 @@ def scale_horizontally():
             temp = App(app_id=app_id)
             temp.save()
     total_combinations = optimizer.permutate()
-    print total_combinations
+    print "Total available combinations: " + str(total_combinations)
     predicted_workload = workload_predictor.predict()
-    print predicted_workload
+    print "Predicted Workload for apps: " + str(predicted_workload)
     selected_combinations = optimizer.optimize(total_combinations, predicted_workload)
-    print selected_combinations
+    print "Selected combination: " + str(selected_combinations)
+    # Save combination choices to each app object.
+    for app_id in (settings.GLOBAL_SETTINGS['APPS']):
+        containers_op_list = []
+        for combination in selected_combinations:
+            containers_op_list.append(combination[app_id])
+        app = App.objects.get(app_id=app_id)
+        app.set_containers_op_list(containers_op_list)
+        app.save()
+    # Deploy the combinations in a FCFS manner.
+    # Selected combinations always << than available servers (guaranteed by the optimizer).
+    # Edgy controller expected to be running in :8001.
+    host = iter(settings.GLOBAL_SETTINGS['HOST_IPS'])
+    for combination in selected_combinations:
+        # print("Scaling Host with IP: " + host)
+        headers = {'Content-Type': 'application/json', }
+        data = '{"combination":' + str(combination) + '}'
+        try:
+            response = requests.post('http://' + next(host) + ':8001/edgy_controller/vertical_scaling/', headers=headers, data=data, timeout=1.5)
+            print 'Vertical Scaling Response: ' + str(response)
+        except requests.Timeout:
+            print('Host unavailable.')
+            pass
+    # !!! DEPRECATED !!! selected_combinations variable now contains shutdown hosts as [0,0]
+    # Now shutdown the unused containers in the rest of the Hosts.
+    # for i in range(len(settings.GLOBAL_SETTINGS['HOST_IPS']) - len(selected_combinations)):
+    #     print 'Shutting down rest of Hosts'
+    #     headers = {'Content-Type': 'application/json', }
+    #     data = '{"combination": [0,0]}'
+    #     # Catch "end of list" exception
+    #     try:
+    #         response = requests.post('http://' + next(host) + ':8001/edgy_controller/vertical_scaling/', headers=headers, data=data, timeout=1.5)
+    #         print response
+    #     except StopIteration:
+    #         break
+    #     except requests.Timeout:
+    #         print('Host unavailable.')
+    #         pass
+    print("Finished scaling Hosts.")
+

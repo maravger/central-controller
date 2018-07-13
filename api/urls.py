@@ -5,5 +5,5 @@ from . import views
 
 
 urlpatterns = [
-        url(r'^offload/(?P<slug>[^/]+)$', views.forwarder.post),
+        url(r'^offload/app/(?P<slug>[^/]+)$', views.forwarder.post),
         ]
