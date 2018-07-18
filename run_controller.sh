@@ -33,4 +33,4 @@ echo
 
 # Finally, initiate controller (TODO: GET OUT OF DEV MODE)
 echo "Step 4/4: Starting server in dev mode..."
-python manage.py runserver 0.0.0.0:8002
+python manage.py runserver 0.0.0.0:8004
