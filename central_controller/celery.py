@@ -22,7 +22,7 @@ app.autodiscover_tasks()
 def debug_task(self):
         print('Request: {0!r}'.format(self.request))
 
-@signals.setup_logging.connect
-def setup_logging(**kwargs):
-    """Setup logging."""
-    pass
+#@signals.setup_logging.connect
+#def setup_logging(**kwargs):
+#    """Setup logging."""
+#    pass

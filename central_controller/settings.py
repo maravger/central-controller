@@ -25,12 +25,12 @@ SECRET_KEY = '3)0_7qe*a9zdsc^hmc++nf0)&qts@nu@ek*%o76c)#)ptql*b@'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["0.0.0.0"]
+ALLOWED_HOSTS = ["0.0.0.0", "10.11.16.112"]
 
 GLOBAL_SETTINGS = {
     'SAMPLING_INTERVAL': 30.0,
     'APPS': [0, 1],
-    'HOST_IPS': ['0.0.0.0', '1.1.1.1'],
+    'HOST_IPS': ['10.11.17.9', '10.11.17.10'],
     'U_PES_MIN': [[0, 0.10, 0.20, 0.30, 0.40], [0, 0.10, 0.20, 0.30, 0.40]],
     'U_PES_MAX': [[0, 0.30, 0.40, 0.50, 0.60], [0, 0.30, 0.40, 0.50, 0.60]],
     'U_REQ_MIN': [[0, 0.5, 3.5, 4.5, 5.5], [0, 0.5, 3.5, 4.5, 5.5]],
@@ -137,7 +137,7 @@ STATIC_URL = '/static/'
 
 # Celery application definition
 # http://docs.celeryproject.org/en/v4.0.2/userguide/configuration.html
-CELERY_WORKER_HIJACK_ROOT_LOGGER = False
+# CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
