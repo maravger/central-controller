@@ -144,6 +144,7 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Athens'
+CELERY_IMPORTS = ('api.tasks',)
 CELERY_BEAT_SCHEDULE = {
     'scale-horizontally': {
         'task': 'api.tasks.horizontal_scaler.scale_horizontally',
