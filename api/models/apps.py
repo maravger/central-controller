@@ -24,7 +24,7 @@ class App(models.Model):
         v = 0.5
         # Get an instance of a logger
         print("Predicting for App: " + str(self.app_id))
-        print(self.prev_subm + self.prev_rej)
+        print("Totally admitted: " + str(self.prev_subm + self.prev_rej))
         prev_real_rr = round(float(self.prev_subm + self.prev_rej) / SAMPLING_INTERVAL, 2)
         print("Previous Real Request Rate: " + str(prev_real_rr))
         s = alpha * prev_real_rr + (1 - alpha) * (self.s - self.b)

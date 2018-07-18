@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)  # type: Logger
 
 @task()
 def scale_horizontally():
+    print "Scaling Horizontally (task)"
     # TODO find a better way to initiate app creation
     for app_id in settings.GLOBAL_SETTINGS['APPS']:
         try:
@@ -44,9 +45,9 @@ def scale_horizontally():
         headers = {'Content-Type': 'application/json', }
         data = '{"combination":' + str(combination) + '}'
         try:
-            response = requests.post('http://' + next(host) + ':8001/edgy_controller/vertical_scaling/', headers=headers, data=data, timeout=1.5)
+            response = requests.post('http://' + next(host) + ':8003/edgy_controller/vertical_scaling/', headers=headers, data=data, timeout=1.5)
             print 'Vertical Scaling Response: ' + str(response)
-        except requests.Timeout:
+        except (requests.Timeout, requests.ConnectionError):
             print('Host unavailable.')
             pass
     # !!! DEPRECATED !!! selected_combinations variable now contains shutdown hosts as [0,0]
