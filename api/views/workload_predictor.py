@@ -9,7 +9,7 @@ def predict():
     for host_ip in settings.GLOBAL_SETTINGS['HOST_IPS']:
         print('Gathering app stats from host with IP: ' + host_ip)
         try:
-            response = requests.get('http://' + host_ip + ':8001/edgy_controller/app_stats/', timeout=1.5)
+            response = requests.get('http://' + host_ip + ':8003/edgy_controller/app_stats/', timeout=1.5)
             new_apps_stats = response.json()
             # Sum apps stats per App. You won't understand this line tomorrow :)
             try:
@@ -18,8 +18,9 @@ def predict():
             # If this is the first time apps_stats is used, assign the data received to it.
             except NameError:
                 apps_stats = new_apps_stats
-        except requests.Timeout:
+        except (requests.Timeout, requests.ConnectionError):
             print('Host unavailable.')
+	    continue
         print apps_stats
     for app_id in settings.GLOBAL_SETTINGS['APPS']:
         app = App.objects.get(app_id=app_id)
