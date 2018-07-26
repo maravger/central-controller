@@ -13,14 +13,14 @@ def predict():
             new_apps_stats = response.json()
             # Sum apps stats per App. You won't understand this line tomorrow :)
             try:
-                {k: {l: apps_stats.get(k).get(l) + new_apps_stats.get(k).get(l)
+                apps_stats = {k: {l: apps_stats.get(k).get(l) + new_apps_stats.get(k).get(l)
                      for l in set(apps_stats.get(k))} for k in set(apps_stats)}
             # If this is the first time apps_stats is used, assign the data received to it.
             except NameError:
                 apps_stats = new_apps_stats
         except (requests.Timeout, requests.ConnectionError):
             print('Host unavailable.')
-	    continue
+            continue
         print apps_stats
     for app_id in settings.GLOBAL_SETTINGS['APPS']:
         app = App.objects.get(app_id=app_id)
