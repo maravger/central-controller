@@ -66,4 +66,4 @@ def scale_horizontally():
     #         print('Host unavailable.')
     #         pass
     print("Finished scaling Hosts.")
-
+    

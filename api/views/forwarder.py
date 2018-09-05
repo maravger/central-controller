@@ -39,6 +39,10 @@ def post(request, slug=None):
         host_id = next(i for i, v in enumerate(cumsum_possibilities) if v > rand)
         print ("Actual selected Host ID: " + str(host_id))
         # app0 is running on :8001 & app1 on 8002
+        
+	#imec->to ntua 
+	#host_id = 1 
+
         resp = offload(slug, host_id, request)
         return Response({'Response' : resp})
     else:
@@ -56,6 +60,7 @@ def offload(app_id, host_id, request):
     json = {"size": size, "start_time": pts}
     files = {"file": img}
     post_url = "http://" + settings.GLOBAL_SETTINGS['HOST_IPS'][host_id]  + ":" + str(8001+int(app_id)) + "/ca_tf/imageUpload/" + img.name
+    #post_url = "http://147.102.13.123:8000/ca_tf/imageUpload/" + img.name
     try:
         return requests.post(post_url, files=files, data=json, timeout=15)
     except (requests.Timeout, requests.ConnectionError):
