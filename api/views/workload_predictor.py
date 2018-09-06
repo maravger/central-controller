@@ -4,6 +4,7 @@ import requests
 import json
 import csv
 import os
+from api.models import App
 
 def predict():
     predicted_workload = []
@@ -41,13 +42,16 @@ def predict():
 	####### save to csv file
     for app_key  , app in apps_stats.iteritems():
     	temp_json = app
+	appid = App.objects.get(app_id = app_key[-1])
+	print "app key " + str(app_key)
+	print "app " + str(app)
     	filename = "./sum_stats_"+app_key
     	with open(filename, 'a') as myfile:
             wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
             # If opened for the first time, insert header row
             if os.path.getsize(filename) == 0:
-                wr.writerow(["requests_submitted", "requests_finished", "requests_rejected","average_response_time", "average_transmission_time", "average_computation_time","average_cpu_usage", "number_of_pes"])
-            wr.writerow([temp_json.get("requests_submitted"),temp_json.get("requests_finished"),temp_json.get("requests_rejected"),temp_json.get("average_response_time"),temp_json.get("average_transmission_time"),temp_json.get("average_computation_time"),temp_json.get("average_cpu_usage"), temp_json.get("number_of_pes")])
+                wr.writerow(["requests_submitted", "requests_finished", "requests_rejected","average_response_time", "average_transmission_time", "average_computation_time","average_cpu_usage", "number_of_pes", "containers_operating_points"])
+            wr.writerow([temp_json.get("requests_submitted"),temp_json.get("requests_finished"),temp_json.get("requests_rejected"),'%.3f' %temp_json.get("average_response_time"),'%.3f' %temp_json.get("average_transmission_time"),'%.3f' % temp_json.get("average_computation_time"),'%.3f' % temp_json.get("average_cpu_usage"), temp_json.get("number_of_pes"), str(appid.get_containers_op_list())])
         ########## end of saving to csv
 
     for app_id in settings.GLOBAL_SETTINGS['APPS']:

@@ -12,7 +12,7 @@ U_REQ_REF = settings.GLOBAL_SETTINGS['U_REQ_REF']
 K1 = settings.GLOBAL_SETTINGS['K1']
 K2 = settings.GLOBAL_SETTINGS['K2']
 MAX_TOTAL_CONT_PES = settings.GLOBAL_SETTINGS['MAX_TOTAL_CONT_PES']
-HOSTS = 2 
+HOSTS = len(settings.GLOBAL_SETTINGS['HOST_IPS']) 
 def permutate():
     op1 = 0
     op2 = 1
@@ -80,7 +80,7 @@ def optimize(combinations, predictedWorkload):
     for i in range(0, n):
         colno3[i] = i + 1
         row3[i] = 1
-        lpsolve('add_constraint', lp, row3, LE, 3)
+        lpsolve('add_constraint', lp, row3, LE, HOSTS)
         colno3 = [0] * n
         row3 = [0] * n
 
@@ -123,11 +123,11 @@ def optimize(combinations, predictedWorkload):
             temp[0][i] -= 1
             final.append(combinations[i])
     for i in range(len(final), HOSTS):
-                final.append([1,1])
-    #
+                final.append([0,0])
+    
     #print final
-    #return final
-    return [[1,1],[1,1]]
+    return final
+    #return [[1,1],[1,1]]
 
 
 

@@ -27,7 +27,11 @@ def post(request, slug=None):
         total_requests_capability = sum(request_procc_cap)
         print ("Total request processing capabilities: " + str(total_requests_capability))
         # Create possibilities by dividing each request capability with total requests capabilities
-        possibilities = map(lambda pc: pc/total_requests_capability, request_procc_cap)
+        if total_requests_capability==0:
+		print len(containers_op_list)
+		possibilities = map(lambda pc: 1.0/float(len(containers_op_list)), request_procc_cap)
+	else:
+		possibilities = map(lambda pc: pc/total_requests_capability, request_procc_cap)
         print ("Respective possibilities of the request being offloaded to container: " + str(possibilities))
         # Create a list containing the cumulative sum of the possibilities
         cumsum_possibilities = reduce(lambda c, x: c + [c[-1] + x], possibilities, [0])[1:]
@@ -39,7 +43,7 @@ def post(request, slug=None):
         host_id = next(i for i, v in enumerate(cumsum_possibilities) if v > rand)
         print ("Actual selected Host ID: " + str(host_id))
         # app0 is running on :8001 & app1 on 8002
-        
+         
 	#imec->to ntua 
 	#host_id = 1 
 
