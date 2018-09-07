@@ -107,6 +107,7 @@ def optimize(combinations, predictedWorkload):
     lpsolve('solve', lp)
     #print ("objective")
     print (lpsolve('get_objective', lp))
+    HOST_OPEN =  (lpsolve('get_objective', lp))
     #print ("variables")
     #print (lpsolve('get_variables', lp))
     #print ("constraints")
@@ -124,8 +125,112 @@ def optimize(combinations, predictedWorkload):
             final.append(combinations[i])
     for i in range(len(final), HOSTS):
                 final.append([0,0])
-    
-    #print final
+
+# start of second lp
+    colno = []
+    row = []
+
+    lp = lpsolve('make_lp', 0, n)
+    lpsolve('set_verbose', lp, IMPORTANT)
+
+
+    for i in range (1,n+1):
+        lpsolve('set_col_name', lp, i, 'p'+str(i))
+        lpsolve('set_int', lp, i, True)
+
+
+    lpsolve('set_add_rowmode', lp, True)
+
+
+    # first    
+    for i in range (0,n):
+        colno.append(i+1)
+        row.append(U_REQ_REF[0][combinations[i][0]])
+        
+    lpsolve('add_constraintex', lp, row, GE, predictedWorkload[0])
+
+
+    #second
+    colno1 = []
+    row1 = []
+    for i in range (0,n):
+        colno1.append(i+1)
+        row1.append(U_REQ_REF[1][combinations[i][1]])
+
+    lpsolve('add_constraint', lp, row1, GE, predictedWorkload[1])
+
+    #third
+
+    colno2 = []
+    row2 = []
+    colno2 = [0] * n
+    row2 = [0] * n
+
+    for i in range (0,n):
+        colno2[i] = i+1
+        row2[i] = 1
+        lpsolve('add_constraint', lp, row2, GE, 0)
+        colno2 = [0] * n
+        row2 = [0] * n
+
+
+    colno3 = []
+    row3 = []
+    colno3 = [0] * n
+    row3 = [0] * n
+
+    for i in range (0,n):
+        colno3[i] = i+1
+        row3[i] = 1
+        lpsolve('add_constraint', lp, row3, LE, HOST_OPEN)
+        colno3 = [0] * n
+        row3 = [0] * n
+
+
+    colno4 = []
+    row4 = []
+    for i in range (0,n):
+        colno4.append(i+1)
+        row4.append(1)
+
+    lpsolve('add_constraint', lp, row4, EQ, HOST_OPEN)
+
+
+    lpsolve('set_add_rowmode', lp, False)
+    colno5 = []
+    row5 = []
+    for i in range (0,n):
+        colno5.append(i+1)
+        row5.append(combinations[i][0]+int(combinations[i][1]))
+
+    lpsolve('set_obj_fn', lp, row5)
+
+    lpsolve('set_minim', lp)
+
+
+    lpsolve('write_lp', lp, 'a.lp')
+    #print (lpsolve('get_mat', lp, 1, 2))
+    lpsolve('solve', lp)
+    #print ("objective")
+    print (lpsolve('get_objective', lp))
+    #print ("variables")
+
+    #print (lpsolve('get_variables', lp))
+    #print ("constraints")
+    #print (lpsolve('get_constraints', lp))
+
+    temp = []
+    final = []
+    temp = (lpsolve('get_variables', lp))
+    print len(temp[0])
+    lpsolve('delete_lp', lp)
+    for i in range(0, len(temp[0])):
+        while (temp[0][i] > 0):
+            temp[0][i] -= 1
+            final.append(combinations[i])
+    for i in range(len(final), HOSTS):
+        final.append([0,0])
+
     return final
     #return [[1,1],[1,1]]
 
