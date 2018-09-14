@@ -12,7 +12,8 @@ class App(models.Model):
     prev_subm = models.IntegerField(default=0)  # Requests submitted in last interval
     prev_rej = models.IntegerField(default=0)  # Requests rejected in last interval
     next_predicted_rr = models.FloatField(default=0)  # Request Rate Limit predicted for the next interval (vertical scaling)
-    containers_op_list = models.CharField(max_length=10)  # A (String) list containing the operating points of the containers running this app
+    previous_predicted_rr = models.FloatField(default=0)  # Request Rate Limit predicted for last interval (vertical scaling)
+    containers_op_list = models.CharField(max_length=10, default = "NaN")  # A (String) list containing the operating points of the containers running this app
 
     def __unicode__(self):
         return self.cont_id
@@ -33,6 +34,7 @@ class App(models.Model):
         print("b = " + str(self.b))
         self.s = round(s + self.b, 2)
         print("Predicted Request Rate: " + str(self.s) + "\n")
+        self.previous_predicted_rr = self.next_predicted_rr
         self.next_predicted_rr = self.s
         self.save()
         return self.next_predicted_rr

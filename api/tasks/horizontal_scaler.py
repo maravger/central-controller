@@ -26,8 +26,21 @@ def scale_horizontally():
     print "Total available combinations: " + str(total_combinations)
     predicted_workload = workload_predictor.predict()
     print "Predicted Workload for apps: " + str(predicted_workload)
-    selected_combinations = optimizer.optimize(total_combinations, predicted_workload)
-    print "Selected combination: " + str(selected_combinations)
+    # set fire_optimizer = None if for both apps previous predicted rr does not differ from next predicted by a Threshold
+    fire_optimizer = next ((app_id for app_id in (settings.GLOBAL_SETTINGS['APPS']) if (abs(App.objects.get(app_id=app_id).next_predicted_rr - App.objects.get(app_id=app_id).previous_predicted_rr) >= settings.GLOBAL_SETTINGS['OPTIMIZER_THRESHOLD']) ), None)
+    if (fire_optimizer != None) or (App.objects.get(app_id="0").containers_op_list=="NaN"):
+	print "fire!"  
+    	selected_combinations = optimizer.optimize(total_combinations, predicted_workload)
+    	print "Selected combination: " + str(selected_combinations)
+    else:
+	print "use previous combinations"
+	selected_combinations = []
+	for i in range (len(settings.GLOBAL_SETTINGS['HOST_IPS'])):
+	    temp = []
+	    for app_id in (settings.GLOBAL_SETTINGS['APPS']):
+	        temp.append(App.objects.get(app_id=app_id).get_containers_op_list()[i])
+	    selected_combinations.append(temp)
+    print selected_combinations
     # Save combination choices to each app object.
     for app_id in (settings.GLOBAL_SETTINGS['APPS']):
         containers_op_list = []
