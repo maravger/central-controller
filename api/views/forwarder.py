@@ -17,7 +17,7 @@ def post(request, slug=None):
     # TODO: test for asynchronous requests
     # slug == app_id
     if slug == "0" or slug == "1":
-        app = App.objects.get(app_id=slug)
+	app = App.objects.get(app_id=slug)
         containers_op_list = app.get_containers_op_list()
         print ("Operating Points of Containers currently running App " + slug + " : "  + str(containers_op_list))
         # Match operating points to request processing capabilities
@@ -45,7 +45,8 @@ def post(request, slug=None):
         # app0 is running on :8001 & app1 on 8002
          
 	#imec->to ntua 
-	#host_id = 1 
+
+#	host_id = 1 
 
         resp = offload(slug, host_id, request)
         return Response({'Response' : resp})

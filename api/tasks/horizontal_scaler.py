@@ -32,6 +32,11 @@ def scale_horizontally():
 	print "fire!"  
     	selected_combinations = optimizer.optimize(total_combinations, predicted_workload)
     	print "Selected combination: " + str(selected_combinations)
+    elif (sum(predicted_workload)==0):
+        print "Zero Predicted Workload"
+	selected_combinations = []
+	for i in range (len(settings.GLOBAL_SETTINGS['HOST_IPS'])):
+	    selected_combinations.append([0,0])
     else:
 	print "use previous combinations"
 	selected_combinations = []
@@ -58,7 +63,7 @@ def scale_horizontally():
         headers = {'Content-Type': 'application/json', }
         data = '{"combination":' + str(combination) + '}'
         try:
-            response = requests.post('http://' + next(host) + ':8003/edgy_controller/vertical_scaling/', headers=headers, data=data, timeout=1.5)
+            response = requests.post('http://' + next(host) + ':8003/edgy_controller/vertical_scaling/', headers=headers, data=data, timeout=5.5)
             print 'Vertical Scaling Response: ' + str(response)
         except (requests.Timeout, requests.ConnectionError):
             print('Host unavailable.')
