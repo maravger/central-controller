@@ -22,16 +22,31 @@ def scale_horizontally():
         except ObjectDoesNotExist:
             temp = App(app_id=app_id)
             temp.save()
-    total_combinations = optimizer.permutate()
+    if len(settings.GLOBAL_SETTINGS['HOST_IPS'])>2 :
+	print "pame lig"
+	total_combinations = optimizer.permutate_ntua()
+    else:
+	total_combinations = optimizer.permutate()
     print "Total available combinations: " + str(total_combinations)
     predicted_workload = workload_predictor.predict()
     print "Predicted Workload for apps: " + str(predicted_workload)
     # set fire_optimizer = None if for both apps previous predicted rr does not differ from next predicted by a Threshold
     fire_optimizer = next ((app_id for app_id in (settings.GLOBAL_SETTINGS['APPS']) if (abs(App.objects.get(app_id=app_id).next_predicted_rr - App.objects.get(app_id=app_id).previous_predicted_rr) >= settings.GLOBAL_SETTINGS['OPTIMIZER_THRESHOLD']) ), None)
     if (fire_optimizer != None) or (App.objects.get(app_id="0").containers_op_list=="NaN"):
-	print "fire!"  
-    	selected_combinations = optimizer.optimize(total_combinations, predicted_workload)
-    	print "Selected combination: " + str(selected_combinations)
+	print "fire!" 
+        if App.objects.get(app_id="0").containers_op_list != "NaN": 
+	    if sum(App.objects.get(app_id="0").get_containers_op_list())==0 :
+	        print "Set [4,4] beacause of first use!!"
+	        selected_combinations = []
+	        selected_combinations.append([4,4])
+	        for i in range (len(settings.GLOBAL_SETTINGS['HOST_IPS'])-1):
+	            selected_combinations.append([0,0])
+         
+	if len(settings.GLOBAL_SETTINGS['HOST_IPS'])>2 :
+    	    selected_combinations = optimizer.optimize_ntua(total_combinations, predicted_workload)
+    	else:
+    	    selected_combinations = optimizer.optimize(total_combinations, predicted_workload)
+	print "Selected combination: " + str(selected_combinations)
     elif (sum(predicted_workload)==0):
         print "Zero Predicted Workload"
 	selected_combinations = []
